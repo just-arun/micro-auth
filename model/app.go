@@ -9,6 +9,6 @@ import (
 type App struct {
 	gorm.Model
 	ID        uint      `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name" gorm:"uniqueIndex"`
+	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
 }

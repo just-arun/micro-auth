@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/just-arun/micro-auth/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type user struct{}
@@ -19,20 +20,28 @@ func (u user) CreateOne(db *gorm.DB, user *model.User) (uint, error) {
 	return user.ID, nil
 }
 
-func (u user) GetOne(db *gorm.DB, filter *model.User) (user *model.User, err error) {
+func (u user) GetOne(db *gorm.DB, filter *model.User) (*model.User, error) {
 	tnx := db.
-		Find(filter).
-		Scan(&user)
+		Model(&model.User{}).
+		Preload(clause.Associations).
+		// Preload("Apps").
+		First(&filter)
 	if tnx.Error != nil {
 		return nil, tnx.Error
 	}
-	return user, nil
+	return filter, nil
 }
 
-func (u user) AddApp(db *gorm.DB, userID uint, app uint) error {
-	if err := db.Model(&model.User{ID: userID}).
-	Update("apps", []model.App{{ID: app}}).Error; err != nil {
-		return err
+func (u user) AddApp(db *gorm.DB, userID uint, apps []model.App) error {
+	user := &model.User{}
+	tnx := db.First(&user, "id = ?", userID).Scan(&user)
+	if tnx.Error != nil {
+		return tnx.Error
+	}
+	user.Apps = append(user.Apps, apps...)
+	tnx = tnx.Save(&user)
+	if tnx.Error != nil {
+		return tnx.Error
 	}
 	return nil
 }

@@ -20,10 +20,10 @@ func (a app) CreateOne(db *gorm.DB, ap *model.App) (uint, error) {
 	return ap.ID, nil
 }
 
-func (a app) GetOne(db *gorm.DB, filter *model.App) (ap *model.User, err error) {
+func (a app) GetOne(db *gorm.DB, filter *model.App) (ap *model.App, err error) {
 	tnx := db.
 		Find(filter).
-		Scan(ap)
+		Scan(&ap)
 	if tnx.Error != nil {
 		return nil, tnx.Error
 	}

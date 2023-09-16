@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -50,10 +51,16 @@ func (r role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 func (r role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := new(model.Role)
-		if err := c.Bind(role); err != nil {
+		var role model.Role
+
+		if err := json.
+			NewDecoder(
+				c.Request().Body,
+			).
+			Decode(&role); err != nil {
 			return err
 		}
-		return service.Role().Add(ctx.DB, *role)
+
+		return service.Role().Add(ctx.DB, role)
 	}
 }

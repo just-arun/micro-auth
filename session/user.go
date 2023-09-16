@@ -61,7 +61,6 @@ func (r userSession) GetManyByUserID(sessionRedisDB *redis.Client, userID uint) 
 		return
 	}
 	count := len(val)
-	fmt.Println(count)
 
 	c := make(chan model.UserSessionData, count)
 	defer close(c)

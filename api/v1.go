@@ -16,7 +16,7 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	env := &model.Env{}
 	n := fmt.Sprintf(".env.%v", environment)
 	util.GetEnv(n, context, &env)
-	ctx := model.HandlerCtx{}
+	ctx := &model.HandlerCtx{}
 	ctx.Env = env
 	pDb := boot.PostgresDB(env.DB.Uri)
 	ctx.DB = pDb
@@ -37,7 +37,7 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	ctx.GeneralSession = generalSession
 
 	v1 := g.Group("/v1")
-	handler.Hello(v1)
+	handler.Role(v1, ctx)
 
 	serverPort := fmt.Sprintf(":%v", port)
 	e.Logger.Fatal(

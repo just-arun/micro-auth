@@ -13,7 +13,10 @@ type role struct{}
 
 func Role(r *echo.Group, ctx *model.HandlerCtx) {
 	st := &role{}
-	r.GET("/role", st.GetNames(ctx))
+	rout := r.Group("/role")
+	rout.GET("/", st.GetNames(ctx))
+	rout.GET("/:id", st.GetOne(ctx))
+	rout.POST("/", st.AddRole(ctx))
 }
 
 func (r role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {

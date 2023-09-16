@@ -16,6 +16,8 @@ func Access(r *echo.Group, ctx *model.HandlerCtx) {
 	st := access{}
 	rout := r.Group("/access")
 	rout.POST("/", st.AddOne(ctx))
+	rout.GET("/", st.GetAll(ctx))
+	rout.DELETE("/:id", st.DeleteOne(ctx))
 }
 
 func (r access) AddOne(ctx *model.HandlerCtx) echo.HandlerFunc {
@@ -53,7 +55,7 @@ func (r access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		
+
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"data": "Access Deleted",
 		})
@@ -74,9 +76,3 @@ func (r access) GetAll(ctx *model.HandlerCtx) echo.HandlerFunc {
 		})
 	}
 }
-
-
-
-
-
-

@@ -21,6 +21,20 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	pDb := boot.PostgresDB(env.DB.Uri)
 	ctx.DB = pDb
 	connections.DB = pDb
+	userSession := boot.Redis(
+		env.UserSession.Address,
+		env.UserSession.Password,
+		env.UserSession.DB,
+		"UserSession",
+	)
+	ctx.UserSession = userSession
+	generalSession := boot.Redis(
+		env.GeneralSession.Address,
+		env.GeneralSession.Password,
+		env.GeneralSession.DB,
+		"GeneralSession",
+	)
+	ctx.GeneralSession = generalSession
 
 	v1 := g.Group("/v1")
 	handler.Hello(v1)

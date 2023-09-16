@@ -1,4 +1,4 @@
-package session
+package service
 
 import (
 	"github.com/just-arun/micro-auth/model"

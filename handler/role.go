@@ -61,6 +61,14 @@ func (r role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return err
 		}
 
-		return service.Role().Add(ctx.DB, role)
+		err := service.Role().Add(ctx.DB, role)
+
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data": "Role Created",
+		})
 	}
 }

@@ -19,3 +19,8 @@ func GetEnv(name string, path string, stru interface{}) {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 }
+
+
+
+
+

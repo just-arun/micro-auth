@@ -20,12 +20,20 @@ func Run(context, envi string) {
 	fmt.Println(seed)
 
 	pDb := boot.PostgresDB(env.DB.Uri)
+
+	// register enums
+	sql := model.RegisterUserType()
+	_ = pDb.Exec(sql).Error
+	
+
 	err := pDb.AutoMigrate(
 		&model.User{},
 		&model.App{},
 		&model.Profile{},
 		&model.Role{},
 		&model.Access{},
+		&model.General{},
+		&model.ServiceMap{},
 	)
 
 	if err != nil {

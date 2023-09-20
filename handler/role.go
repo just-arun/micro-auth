@@ -10,17 +10,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type role struct{}
+type Role struct{}
 
-func Role(r *echo.Group, ctx *model.HandlerCtx) {
-	st := &role{}
-	rout := r.Group("/role")
-	rout.GET("/", st.GetNames(ctx))
-	rout.GET("/:id", st.GetOne(ctx))
-	rout.POST("/", st.AddRole(ctx))
-}
-
-func (r role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		data, err := service.Role().GetNames(ctx.DB)
 		if err != nil {
@@ -32,7 +24,7 @@ func (r role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
@@ -49,7 +41,7 @@ func (r role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var role model.Role
 

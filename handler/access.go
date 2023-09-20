@@ -10,17 +10,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type access struct{}
+type Access struct{}
 
-func Access(r *echo.Group, ctx *model.HandlerCtx) {
-	st := access{}
-	rout := r.Group("/access")
-	rout.POST("/", st.AddOne(ctx))
-	rout.GET("/", st.GetAll(ctx))
-	rout.DELETE("/:id", st.DeleteOne(ctx))
-}
 
-func (r access) AddOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Access) AddOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var access model.Access
 
@@ -43,7 +36,7 @@ func (r access) AddOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
@@ -62,7 +55,7 @@ func (r access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r access) GetAll(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Access) GetAll(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		data, err := service.Access().GetAll(ctx.DB)

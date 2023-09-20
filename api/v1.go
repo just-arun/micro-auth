@@ -5,9 +5,10 @@ import (
 
 	"github.com/just-arun/micro-auth/boot"
 	"github.com/just-arun/micro-auth/connections"
-	"github.com/just-arun/micro-auth/handler"
 	"github.com/just-arun/micro-auth/model"
+	"github.com/just-arun/micro-auth/routes"
 	"github.com/just-arun/micro-auth/util"
+	pb "github.com/just-arun/micro-session-proto"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,24 +21,22 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	ctx.Env = env
 	pDb := boot.PostgresDB(env.DB.Uri)
 	ctx.DB = pDb
-	connections.DB = pDb
-	userSession := boot.Redis(
-		env.UserSession.Address,
-		env.UserSession.Password,
-		env.UserSession.DB,
-		"UserSession",
-	)
-	ctx.UserSession = userSession
-	generalSession := boot.Redis(
-		env.GeneralSession.Address,
-		env.GeneralSession.Password,
-		env.GeneralSession.DB,
-		"GeneralSession",
-	)
-	ctx.GeneralSession = generalSession
+
+	conn := boot.NewGrpcConnection(env.Grpc.Host, env.Grpc.Port)
+
+	client := pb.NewSessionServiceClient(conn)
+
+	ctx.GrpcClient = &client
+
+	natsConnection := boot.NatsConnection(env.Nats.Token)
+
+	ctx.NatsConnection = natsConnection
+
+	connections.HandlerCtx = ctx
 
 	v1 := g.Group("/v1")
-	handler.Role(v1, ctx)
+	routes.Role(v1, ctx)
+	routes.Auth(v1, ctx)
 
 	serverPort := fmt.Sprintf(":%v", port)
 	e.Logger.Fatal(

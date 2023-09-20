@@ -21,5 +21,6 @@ func (r general) Get(db *gorm.DB) (data *model.General, err error) {
 }
 
 func (r general) Update(db *gorm.DB, id uint, data *model.General) (err error) {
-	return db.Save(data).Error
+	data.ID = id
+	return db.Save(&data).Error
 }

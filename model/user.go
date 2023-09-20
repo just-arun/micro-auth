@@ -12,7 +12,7 @@ type UserType string
 
 const (
 	UserTypeUnVerify UserType = "UN_VERIFIED"
-	UserTypeActive   UserType = "ACTIVE"
+	UserTypeVerified UserType = "VERIFIED"
 	UserTypeDisabled UserType = "DISABLED"
 	UserTypeDeleted  UserType = "DELETED"
 )
@@ -20,7 +20,7 @@ const (
 func RegisterUserType() string {
 	return `CREATE TYPE user_type AS ENUM (
 		'UN_VERIFIED',
-		'ACTIVE',
+		'VERIFIED',
 		'DISABLED',
 		'DELETED'
 	);`
@@ -38,7 +38,7 @@ func (ct UserType) Value() (driver.Value, error) {
 type User struct {
 	gorm.Model
 	ID        uint      `json:"id" gorm:"primaryKey"`
-	Email     string    `json:"email"`
+	Email     string    `json:"email" gorm:"uniqueIndex"`
 	UserName  string    `json:"userName"`
 	Password  string    `json:"password"`
 	Type      UserType  `json:"type" gorm:"type:user_type;default:UN_VERIFIED"`

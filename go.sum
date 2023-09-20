@@ -146,6 +146,10 @@ github.com/just-arun/micro-session-proto v0.0.0-20230918085843-5b5e69b4f566 h1:u
 github.com/just-arun/micro-session-proto v0.0.0-20230918085843-5b5e69b4f566/go.mod h1:KSmWNkwCtZ7KcZ8udl9VR3vSQtvXE5JIchFjLKan6Ek=
 github.com/just-arun/micro-session-proto v0.0.0-20230918135008-d87ad72ae4cc h1:cSCVVc19vvSzfLozAkj7iQF6CMWvUWSxoe97Gi54rdA=
 github.com/just-arun/micro-session-proto v0.0.0-20230918135008-d87ad72ae4cc/go.mod h1:wge73pY6dFqrwzks+e034ovFj3m7TTGvtefWQIYShaM=
+github.com/just-arun/micro-session-proto v0.0.0-20230919201200-f2a7f1430496 h1:EU6zaPQv3kQiMjQ+Fqsixlxjn4xYKTIWZ7TTF6NymIc=
+github.com/just-arun/micro-session-proto v0.0.0-20230919201200-f2a7f1430496/go.mod h1:wge73pY6dFqrwzks+e034ovFj3m7TTGvtefWQIYShaM=
+github.com/just-arun/micro-session-proto v0.0.0-20230920191608-3c6a2f48e096 h1:h3NAffjdublKAvnhk5pa90Yo5EB57acwxpXcwUwc5NY=
+github.com/just-arun/micro-session-proto v0.0.0-20230920191608-3c6a2f48e096/go.mod h1:wge73pY6dFqrwzks+e034ovFj3m7TTGvtefWQIYShaM=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/klauspost/compress v1.16.7 h1:2mk3MPGNzKyxErAw8YaohYh69+pa4sIQSC0fPGCFR9I=
 github.com/klauspost/compress v1.16.7/go.mod h1:ntbaceVETuRiXiv4DpjP66DpAtAGkEQskQzEyD//IeE=

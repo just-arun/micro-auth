@@ -14,17 +14,11 @@ func Run(context, envi string) {
 	env := &model.Env{}
 	util.GetEnv(fmt.Sprintf(".env.%v", envi), context, &env)
 
-	seed := &model.Seed{}
-	util.GetEnv(fmt.Sprintf(".seed.%v", envi), context, &seed)
-
-	fmt.Println(seed)
-
 	pDb := boot.PostgresDB(env.DB.Uri)
 
 	// register enums
 	sql := model.RegisterUserType()
 	_ = pDb.Exec(sql).Error
-	
 
 	err := pDb.AutoMigrate(
 		&model.User{},
@@ -41,12 +35,20 @@ func Run(context, envi string) {
 	}
 
 	user := &model.User{
-		Email:    seed.Admin.Email,
-		UserName: seed.Admin.UserName,
-		Password: seed.Admin.Password,
+		Email:    env.Admin.Email,
+		UserName: env.Admin.UserName,
+		Password: env.Admin.Password,
 	}
 
-	userID, _ := service.User().CreateOne(pDb, user)
+	// registering super user user
+	_, _ = service.User().CreateOne(pDb, user)
 
-	fmt.Println("User ID: ", userID)
+	_ = service.General().Create(pDb, &model.General{
+		CanLogin:                env.General.CanLogin,
+		CanRegister:             env.General.CanRegister,
+		HttpOnlyCookie:          env.General.HttpOnlyCookie,
+		AccessTokenExpiryTime:   env.General.AccessTokenExpiryTime,
+		RefreshTokenExpiryTime:  env.General.RefreshTOkenExpiryTime,
+		OrganizationEmailDomain: env.General.OrganizationEmailDomain,
+	})
 }

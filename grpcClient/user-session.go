@@ -2,7 +2,6 @@ package grpcclient
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	pb "github.com/just-arun/micro-session-proto"
@@ -14,21 +13,17 @@ func UserSession() userSession {
 	return userSession{}
 }
 
-func (s userSession) SetUserSession(client pb.SessionServiceClient, userID uint, role string) error {
+func (s userSession) SetUserSession(client pb.SessionServiceClient, userID uint, roles []string) (*pb.SetUserSessionResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	
 	res, err := client.SetUserSession(ctx, &pb.UserSessionPayload{
 		UserID: 143,
-		Role:   "admin",
+		Role:   roles,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Println("Access Token", res.Token)
-	fmt.Println("Refresh Token", res.Refresh)
-
-	return nil
+	return res, nil
 }

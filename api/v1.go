@@ -37,6 +37,9 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	v1 := g.Group("/v1")
 	routes.Role(v1, ctx)
 	routes.Auth(v1, ctx)
+	routes.Access(v1, ctx)
+	routes.Role(v1, ctx)
+	routes.ServiceMap(v1, ctx)
 
 	serverPort := fmt.Sprintf(":%v", port)
 	e.Logger.Fatal(

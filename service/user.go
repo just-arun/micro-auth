@@ -13,11 +13,22 @@ func User() user {
 }
 
 func (u user) CreateOne(db *gorm.DB, user *model.User) (uint, error) {
-	tnx := db.Model(&model.User{}).Save(&user)
+	user.Type = model.UserTypeUnVerify
+	tnx := db.Save(&user)
 	if tnx.Error != nil {
 		return 0, tnx.Error
 	}
 	return user.ID, nil
+}
+
+func (u user) UpdateVerify(db *gorm.DB, userID uint) error {
+	user := &model.User{ID: userID}
+	tnx := db.First(&user)
+	if tnx.Error != nil {
+		return tnx.Error
+	}
+	user.Type = model.UserTypeVerified
+	return tnx.Save(&user).Error
 }
 
 func (u user) GetOne(db *gorm.DB, filter *model.User) (*model.User, error) {

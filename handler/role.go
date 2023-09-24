@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -9,17 +10,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type role struct{}
+type Role struct{}
 
-func Role(r *echo.Group, ctx *model.HandlerCtx) {
-	st := &role{}
-	rout := r.Group("/role")
-	rout.GET("/", st.GetNames(ctx))
-	rout.GET("/:id", st.GetOne(ctx))
-	rout.POST("/", st.AddRole(ctx))
-}
-
-func (r role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		data, err := service.Role().GetNames(ctx.DB)
 		if err != nil {
@@ -31,7 +24,7 @@ func (r role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
@@ -48,12 +41,26 @@ func (r role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (r Role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := new(model.Role)
-		if err := c.Bind(role); err != nil {
+		var role model.Role
+
+		if err := json.
+			NewDecoder(
+				c.Request().Body,
+			).
+			Decode(&role); err != nil {
 			return err
 		}
-		return service.Role().Add(ctx.DB, *role)
+
+		err := service.Role().Add(ctx.DB, role)
+
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusCreated, map[string]interface{}{
+			"data": "Role Created",
+		})
 	}
 }

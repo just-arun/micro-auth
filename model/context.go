@@ -1,13 +1,14 @@
 package model
 
 import (
-	"github.com/redis/go-redis/v9"
+	pb "github.com/just-arun/micro-session-proto"
+	"github.com/nats-io/nats.go"
 	"gorm.io/gorm"
 )
 
 type HandlerCtx struct {
 	Env            *Env
 	DB             *gorm.DB
-	UserSession    *redis.Client
-	GeneralSession *redis.Client
+	GrpcClient     *pb.SessionServiceClient
+	NatsConnection *nats.EncodedConn
 }

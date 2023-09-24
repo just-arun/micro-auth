@@ -4,7 +4,21 @@ import "gorm.io/gorm"
 
 type Access struct {
 	gorm.Model
-	ID   uint
-	Name string
-	Key  string
+	ID   uint   `json:"id" gorm:"primaryKey"`
+	Name string `json:"name"`
+	Key  string `json:"key"`
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

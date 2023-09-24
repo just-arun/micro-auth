@@ -28,6 +28,7 @@ func Run(context, envi string) {
 		&model.Access{},
 		&model.General{},
 		&model.ServiceMap{},
+		&model.Mail{},
 	)
 
 	if err != nil {
@@ -38,6 +39,8 @@ func Run(context, envi string) {
 		Email:    env.Admin.Email,
 		UserName: env.Admin.UserName,
 		Password: env.Admin.Password,
+		Roles: []model.Role{},
+		Apps: []model.App{},
 	}
 
 	// registering super user user

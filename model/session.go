@@ -13,3 +13,5 @@ type UserSessionData struct {
 	UserID uint
 	Time   time.Time
 }
+
+

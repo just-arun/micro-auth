@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql/driver"
 	"time"
 
 	"github.com/just-arun/micro-auth/util"
@@ -26,14 +25,14 @@ func RegisterUserType() string {
 	);`
 }
 
-func (ct *UserType) Scan(value interface{}) error {
-	*ct = UserType(value.([]byte))
-	return nil
-}
+// func (ct *UserType) Scan(value interface{}) error {
+// 	*ct = UserType(value.([]byte))
+// 	return nil
+// }
 
-func (ct UserType) Value() (driver.Value, error) {
-	return string(ct), nil
-}
+// func (ct UserType) Value() (driver.Value, error) {
+// 	return string(ct), nil
+// }
 
 type User struct {
 	gorm.Model

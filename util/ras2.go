@@ -8,6 +8,7 @@ import (
 	"crypto/sha1"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 )
 
@@ -21,7 +22,7 @@ func Rsa2() rsaStruct2 {
 	return rsaStruct2{}
 }
 
-func (r rsaStruct2) Hash(data []byte) []byte {
+func hash(data []byte) []byte {
 	s := sha1.Sum(data)
 	return s[:]
 
@@ -47,6 +48,12 @@ func (r rsaStruct2) GenerateKeyBytes() (privateBytes, publicBytes []byte, err er
 	return priBytes, pubBytes, nil
 }
 
+func (r rsaStruct2) GenerateBase64PublicKeyFromPrivateKey(key *rsa.PrivateKey) string {
+	pub := key.PublicKey
+	pubByte := x509.MarshalPKCS1PublicKey(&pub)
+	return base64.StdEncoding.EncodeToString(pubByte)
+}
+
 func (r rsaStruct2) GenerateKey64() (pri64, pub64 string, err error) {
 	pri, pub, err := r.GenerateKeyBytes()
 	if err != nil {
@@ -58,15 +65,15 @@ func (r rsaStruct2) GenerateKey64() (pri64, pub64 string, err error) {
 }
 
 func (r rsaStruct2) PublicKeyFrom(key []byte) (*rsa.PublicKey, error) {
-	pubInterface, err := x509.ParsePKIXPublicKey(key)
+	pubInterface, err := x509.ParsePKCS1PublicKey(key)
 	if err != nil {
 		return nil, err
 	}
-	pub, ok := pubInterface.(*rsa.PublicKey)
-	if !ok {
-		return nil, errors.New("invalid public key")
-	}
-	return pub, nil
+	// pub, ok := pubInterface.(*rsa.PublicKey)
+	// if !ok {
+	// 	return nil, errors.New("invalid public key")
+	// }
+	return pubInterface, nil
 }
 
 func (r rsaStruct2) PublicKeyFrom64(key string) (*rsa.PublicKey, error) {
@@ -101,6 +108,14 @@ func (r rsaStruct2) PublicEncrypt(key *rsa.PublicKey, data []byte) ([]byte, erro
 	return rsa.EncryptPKCS1v15(rand.Reader, key, data)
 }
 
+func (r rsaStruct2) PublicEncryptReturnsBase64String(key *rsa.PublicKey, data []byte) (base64String string, err error) {
+	resu, err := r.PublicEncrypt(key, data)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(resu), nil
+}
+
 func (r rsaStruct2) PublicSign(key *rsa.PublicKey, data []byte) ([]byte, error) {
 	return r.PublicEncrypt(key, hash(data))
 }
@@ -111,6 +126,14 @@ func (r rsaStruct2) PublicVerify(key *rsa.PublicKey, sign, data []byte) error {
 
 func (r rsaStruct2) PrivateDecrypt(key *rsa.PrivateKey, data []byte) ([]byte, error) {
 	return rsa.DecryptPKCS1v15(rand.Reader, key, data)
+}
+
+func (r rsaStruct2) PrivateDecryptWithBase64String(key *rsa.PrivateKey, data string) ([]byte, error) {
+	str, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+	return r.PrivateDecrypt(key, str)
 }
 
 func (r rsaStruct2) PrivateSign(key *rsa.PrivateKey, data []byte) ([]byte, error) {
@@ -124,6 +147,61 @@ func (r rsaStruct2) PrivateVerify(key *rsa.PrivateKey, sign, data []byte) error 
 	}
 	if !bytes.Equal(h, hash(data)) {
 		return rsa.ErrVerification
+	}
+	return nil
+}
+
+func (r rsaStruct2) EncryptObject(stru interface{}, publicKeyBase64 string) (map[string]string, error) {
+	pubK, err := r.PublicKeyFrom64(publicKeyBase64)
+	if err != nil {
+		return map[string]string{}, err
+	}
+
+	b, err := json.Marshal(stru)
+	if err != nil {
+		return map[string]string{}, err
+	}
+
+	m := JsonToMap(string(b))
+
+	for k, v := range m {
+		encStr, err := r.PublicEncryptReturnsBase64String(pubK, []byte(v.(string)))
+		if err != nil {
+			return map[string]string{}, err
+		}
+		m[k] = encStr
+	}
+	return map[string]string{"d": ""}, nil
+}
+
+func (r rsaStruct2) DecryptObject(pointerToStruct interface{}, privateKey string) error {
+	priK, err := r.PrivateKeyFrom64(privateKey)
+	if err != nil {
+		return nil
+	}
+
+	b, err := json.Marshal(pointerToStruct)
+	if err != nil {
+		return err
+	}
+
+	m := JsonToMap(string(b))
+
+	for k, v := range m {
+		encStr, err := r.PrivateDecryptWithBase64String(priK, v.(string))
+		if err != nil {
+			return err
+		}
+		m[k] = string(encStr)
+	}
+
+	bytData, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(bytData, &pointerToStruct)
+	if err != nil {
+		return err
 	}
 	return nil
 }

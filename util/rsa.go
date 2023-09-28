@@ -5,7 +5,6 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
@@ -22,11 +21,6 @@ type rsaStruct struct{}
 
 func Rsa() rsaStruct {
 	return rsaStruct{}
-}
-
-func hash(data []byte) []byte {
-	s := sha1.Sum(data)
-	return s[:]
 }
 
 func (r rsaStruct) Encrypt(base64PublicKey, valueToEncrypt string) (encryptedBase64String string, err error) {

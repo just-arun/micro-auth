@@ -23,20 +23,6 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("keys called")
 
-		// pr, err := util.Rsa().GeneratePrivateKey()
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// pri := util.Rsa().Base64PrivateKeyFromPrivateKey(pr)
-
-		// pub, err := util.Rsa().GeneratePublicKeyBase64(pr)
-		// if err != nil {
-		// 	panic(err)
-		// }
-
-		// fmt.Println("Base64 Public KEY \n---------------\n", pub)
-		// fmt.Println("\nBase64 Private KEY\n---------------\n", pri)
-
 		pri, pub, err := util.Rsa2().GenerateKey64()
 
 		if err != nil {
@@ -45,6 +31,7 @@ to quickly create a Cobra application.`,
 
 		fmt.Println("Base64 Public KEY \n---------------\n", pub)
 		fmt.Println("\nBase64 Private KEY\n---------------\n", pri)
+
 	},
 }
 

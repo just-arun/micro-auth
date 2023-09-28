@@ -43,6 +43,12 @@ func (a Auth) Login(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return err
 		}
 
+		err = util.Rsa2().DecryptObject(&body, ctx.Env.Rsa.PrivateKey)
+		if err != nil {
+			return err
+		}
+
+
 		filter := &model.User{Email: body.Email}
 		// getting user form data
 		user, err := service.User().GetOne(ctx.DB, filter)
@@ -157,16 +163,13 @@ func (a Auth) Register(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 func (a Auth) GetPublicKey(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		privateKey, err := util.Rsa().PrivateKeyFrom64(ctx.Env.Rsa.PrivateKey)
+		privateKey, err := util.Rsa2().PrivateKeyFrom64(ctx.Env.Rsa.PrivateKey)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
-		publicKey, err := util.Rsa().GeneratePublicKeyBase64(privateKey)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
+
+		publicKey := util.Rsa2().GenerateBase64PublicKeyFromPrivateKey(privateKey)
 
 		_, err = grpcClient.UserSession().SetUserSession(*ctx.GrpcClient, 2, []string{"admin", "analyst"})
 		if err != nil {

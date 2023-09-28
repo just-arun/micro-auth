@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/just-arun/micro-auth/util"
 	"github.com/spf13/cobra"
@@ -21,6 +22,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("decrypt called")
 		key, err := cmd.Flags().GetString("privateKey")
 		if err != nil {
 			panic("private key")
@@ -30,12 +32,19 @@ to quickly create a Cobra application.`,
 			panic("value")
 		}
 
-		value, err := util.Rsa().Decrypt(key, str)
+		priK, err := util.Rsa2().PrivateKeyFrom64(key)
+
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("ERROR: (3) %v", err)
 		}
-		fmt.Printf("VALUE: \n-----------------\n\n%v\n\n", value)
-		fmt.Println("decrypt called")
+
+		decStr, err := util.Rsa2().PrivateDecryptWithBase64String(priK, str)
+
+		if err != nil {
+			log.Fatalf("ERROR: (4) %v", err)
+		}
+
+		fmt.Println("\n\nDECODED STRING: \n-------------------------\n\n", string(decStr))
 	},
 }
 

@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/just-arun/micro-auth/util"
 	"github.com/spf13/cobra"
@@ -29,21 +30,21 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			panic("value error")
 		}
-		// value, err := util.Rsa().Encrypt(key, str)
-		// if err != nil {
-		// 	panic(err.Error())
-		// }
-		// fmt.Printf("VALUE\n----------------------------\n\n%v\n\n", value)
-		// fmt.Println("encrypt called")
-		pub, err := util.Rsa2().PublicKeyFrom64(key)
+
+		pubk, err := util.Rsa2().PublicKeyFrom64(key)
+
 		if err != nil {
-			panic(err)
+			log.Fatalf("ERROR: (0) %v", err)
 		}
-		val, err := util.Rsa2().PublicEncrypt(pub, []byte(str))
+
+		encStr, err := util.Rsa2().PublicEncryptReturnsBase64String(pubk, []byte(str))
+
 		if err != nil {
-			panic(err)
+			log.Fatalf("ERROR: (1) %v", err)
 		}
-		fmt.Println(string(val))
+
+		fmt.Println("\n\nENCRYPTED STRING: \n-------------------------\n\n", encStr)
+
 	},
 }
 
@@ -59,6 +60,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// encryptCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	encryptCmd.Flags().StringP("publicKey", "k", "", "public key")
+	encryptCmd.Flags().StringP("publicKey", "k", "", "public key in base64 formate")
 	encryptCmd.Flags().StringP("value", "v", "", "string to encrypt")
 }

@@ -18,8 +18,6 @@ type Auth struct{}
 
 func (a Auth) Login(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		fmt.Println(0)
-
 		// get app settings
 		general, err := service.General().Get(ctx.DB)
 		if err != nil {
@@ -47,7 +45,6 @@ func (a Auth) Login(ctx *model.HandlerCtx) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-
 
 		filter := &model.User{Email: body.Email}
 		// getting user form data

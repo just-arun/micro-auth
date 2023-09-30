@@ -15,7 +15,7 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/just-arun/micro-session-proto v1.0.14 // indirect
+	github.com/just-arun/micro-session-proto v1.0.20 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/labstack/echo/v4 v4.11.1 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect

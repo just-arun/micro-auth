@@ -7,6 +7,7 @@ import (
 	"github.com/just-arun/micro-auth/boot"
 	"github.com/just-arun/micro-auth/connections"
 	"github.com/just-arun/micro-auth/model"
+	"github.com/just-arun/micro-auth/pubsub"
 	"github.com/just-arun/micro-auth/routes"
 	"github.com/just-arun/micro-auth/util"
 	pb "github.com/just-arun/micro-session-proto"
@@ -72,6 +73,11 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	// 	for _, v := range data {
 	// 		pDb.Save(&v)
 	// 	}
+
+	pubsub.Publisher().ChangeServiceMap(natsConnection, []model.ServiceMap{
+		{ID: 1, Key: "auth", Value: "http://localhost:8090/api/v1", Auth: false},
+		{ID: 2, Key: "some.other-stuff", Value: "http://localhost:8081/api", Auth: false},
+	})
 
 	serverPort := fmt.Sprintf(":%v", port)
 	e.Logger.Fatal(

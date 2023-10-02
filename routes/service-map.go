@@ -9,9 +9,8 @@ import (
 func ServiceMap(r *echo.Group, ctx *model.HandlerCtx) {
 	st := &handler.ServiceMap{}
 	rout := r.Group("/service-map")
-	rout.GET("/", st.GetMany(ctx))
+	rout.GET("", st.GetMany(ctx))
 	rout.GET("/:id", st.GetOne(ctx))
-	rout.POST("/", st.Add(ctx))
-	rout.PUT("/:id", st.UpdateOne(ctx))
-	rout.DELETE("/", st.DeleteOne(ctx))
+	rout.POST("", st.Add(ctx))
+	rout.DELETE("/:id", st.DeleteOne(ctx))
 }

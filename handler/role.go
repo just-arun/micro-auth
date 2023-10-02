@@ -7,6 +7,7 @@ import (
 
 	"github.com/just-arun/micro-auth/model"
 	"github.com/just-arun/micro-auth/service"
+	"github.com/just-arun/micro-auth/util"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,9 +17,9 @@ func (r Role) GetNames(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		data, err := service.Role().GetNames(ctx.DB)
 		if err != nil {
-			return err
+			return util.Res(c).SendError(http.StatusConflict, err)
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"roles": data,
 		})
 	}
@@ -29,13 +30,13 @@ func (r Role) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
 		if err != nil {
-			return err
+			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 		data, err := service.Role().GetOne(ctx.DB, uint(id))
 		if err != nil {
-			return err
+			return util.Res(c).SendError(http.StatusConflict, err)
 		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"role": data,
 		})
 	}
@@ -50,17 +51,48 @@ func (r Role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 				c.Request().Body,
 			).
 			Decode(&role); err != nil {
-			return err
+			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 
-		err := service.Role().Add(ctx.DB, role)
+		err := service.Role().Add(ctx.DB, &role)
 
 		if err != nil {
-			return err
+			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 
-		return c.JSON(http.StatusCreated, map[string]interface{}{
-			"data": "Role Created",
+		return util.Res(c).SendSuccess(http.StatusCreated, map[string]interface{}{
+			"data": map[string]uint{
+				"id": role.ID,
+			},
+		})
+	}
+}
+
+func (r Role) AddAccess(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+		var access model.Access
+
+		if err := json.
+			NewDecoder(
+				c.Request().Body,
+			).
+			Decode(&access); err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.Role().AddAccess(ctx.DB, uint(id), &access)
+
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"data": "Access added to role",
 		})
 	}
 }

@@ -12,12 +12,29 @@ func Role() role {
 }
 
 func (r role) GetNames(db *gorm.DB) (roles []model.Role, err error) {
-	err = db.Find(&model.Role{}).Scan(&roles).Error
+	err = db.
+		// Preload(clause.Associations).
+		Preload("Accesses").
+		Find(&roles).Error
+	// Model(&model.Role{}).Scan(&roles).Error
 	return
 }
 
-func (r role) Add(db *gorm.DB, role model.Role) (err error) {
-	err = db.Save(role).Error
+func (r role) Add(db *gorm.DB, role *model.Role) (err error) {
+	err = db.Save(&role).Error
+	return
+}
+
+func (r role) AddAccess(db *gorm.DB, id uint, access *model.Access) (err error) {
+	role := &model.Role{ID: id}
+	tnx := db.First(&role)
+	if tnx.Error != nil {
+		return err
+	}
+	role.Accesses = append(role.Accesses, *access)
+	if tnx.Save(role).Error != nil {
+		return
+	}
 	return
 }
 

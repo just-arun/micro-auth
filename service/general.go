@@ -16,7 +16,7 @@ func (r general) Create(db *gorm.DB, data *model.General) error {
 }
 
 func (r general) Get(db *gorm.DB) (data *model.General, err error) {
-	err = db.First(&data).Error
+	err = db.Last(&data).Error
 	return
 }
 

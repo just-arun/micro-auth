@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Role struct {
 	gorm.Model
-	ID       uint     `gorm:"primaryKey"`
+	ID       uint     `json:"id" gorm:"primaryKey"`
 	Name     string   `json:"name" gorm:"uniqueIndex"`
-	Accesses []Access `json:"access,omitempty" gorm:"many2many:role_access;"`
+	Accesses []Access `json:"accesses" gorm:"many2many:role_access;"`
 }
 
 

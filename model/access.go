@@ -1,24 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Access struct {
-	gorm.Model
-	ID   uint   `json:"id" gorm:"primaryKey"`
+	ID   uint   `json:"id,omitempty" gorm:"primaryKey"`
 	Name string `json:"name"`
 	Key  string `json:"key"`
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

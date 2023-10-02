@@ -21,6 +21,17 @@ func (u user) CreateOne(db *gorm.DB, user *model.User) (uint, error) {
 	return user.ID, nil
 }
 
+func (u user) CreateMultiple(db *gorm.DB, users []*model.User) error {
+	for i, _ := range users {
+		users[i].Type = model.UserTypeUnVerify
+	}
+	tnx := db.Save(&users)
+	if tnx.Error != nil {
+		return tnx.Error
+	}
+	return nil
+}
+
 func (u user) UpdateVerify(db *gorm.DB, userID uint) error {
 	user := &model.User{ID: userID}
 	tnx := db.First(&user)
@@ -41,6 +52,14 @@ func (u user) GetOne(db *gorm.DB, filter *model.User) (*model.User, error) {
 		return nil, tnx.Error
 	}
 	return filter, nil
+}
+
+func (u user) GetMany(db *gorm.DB, filter *model.User) (data []model.User, err error) {
+	err = db.
+		Model(&filter).
+		Scan(&data).
+		Error
+	return
 }
 
 func (u user) AddApp(db *gorm.DB, userID uint, apps []model.App) error {

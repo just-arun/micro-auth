@@ -9,7 +9,8 @@ import (
 func Role(r *echo.Group, ctx *model.HandlerCtx) {
 	st := &handler.Role{}
 	rout := r.Group("/role")
-	rout.GET("/", st.GetNames(ctx))
+	rout.GET("", st.GetNames(ctx))
 	rout.GET("/:id", st.GetOne(ctx))
-	rout.POST("/", st.AddRole(ctx))
+	rout.POST("", st.AddRole(ctx))
+	rout.PUT("/:id", st.AddAccess(ctx))
 }

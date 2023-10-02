@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/just-arun/micro-auth/model"
 	"gorm.io/gorm"
 )
@@ -27,6 +29,7 @@ func (st serviceMap) GetMany(db *gorm.DB) (data []model.ServiceMap, err error) {
 
 func (st serviceMap) UpdateOne(db *gorm.DB, id uint, data *model.ServiceMap) (err error) {
 	data.ID = id
+	fmt.Println("ID: ", id)
 	return db.Save(&data).Error
 }
 

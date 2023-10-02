@@ -1,11 +1,9 @@
 package model
 
-import "gorm.io/gorm"
-
 type ServiceMap struct {
-	gorm.Model
-	ID    uint   `json:"id" gorm:"primaryKey"`
-	Key   string `json:"key" gorm:"uniqueIndex"`
-	Value string `json:"value" gorm:"uniqueIndex"`
-	Auth  bool   `json:"bool" gorm:"default:false"`
+	ID      uint   `json:"id,omitempty" gorm:"primaryKey"`
+	Key     string `json:"key,omitempty" gorm:"uniqueIndex"`
+	Value   string `json:"value,omitempty"`
+	Auth    bool   `json:"auth" gorm:"default:false"`
+	Default bool   `json:"default"`
 }

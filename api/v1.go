@@ -9,6 +9,7 @@ import (
 	"github.com/just-arun/micro-auth/model"
 	"github.com/just-arun/micro-auth/pubsub"
 	"github.com/just-arun/micro-auth/routes"
+	"github.com/just-arun/micro-auth/service"
 	"github.com/just-arun/micro-auth/util"
 	pb "github.com/just-arun/micro-session-proto"
 	"github.com/labstack/echo/v4"
@@ -37,6 +38,8 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	connections.HandlerCtx = ctx
 
 	v1 := g.Group("/v1")
+	routes.General(v1, ctx)
+	routes.User(v1, ctx)
 	routes.Role(v1, ctx)
 	routes.Auth(v1, ctx)
 	routes.Access(v1, ctx)
@@ -74,10 +77,11 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	// 		pDb.Save(&v)
 	// 	}
 
-	pubsub.Publisher().ChangeServiceMap(natsConnection, []model.ServiceMap{
-		{ID: 1, Key: "auth", Value: "http://localhost:8090/api/v1", Auth: false},
-		{ID: 2, Key: "some.other-stuff", Value: "http://localhost:8081/api", Auth: false},
-	})
+	byteData, err := service.ServiceMap().GetMany(ctx.DB)
+	if err != nil {
+		panic(err)
+	}
+	_ = pubsub.Publisher().ChangeServiceMap(natsConnection, byteData)
 
 	serverPort := fmt.Sprintf(":%v", port)
 	e.Logger.Fatal(

@@ -16,7 +16,7 @@ func (r access) AddOne(db *gorm.DB, access model.Access) error {
 }
 
 func (r access) GetAll(db *gorm.DB) (accesses []model.Access, err error) {
-	err = db.Find(&model.Access{}).Scan(&accesses).Error
+	err = db.Model(&model.Access{}).Scan(&accesses).Error
 	return
 }
 

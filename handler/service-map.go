@@ -74,24 +74,37 @@ func (st ServiceMap) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-			"data": data,
+			"serviceMap": data,
 		})
 	}
 }
 
-func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (st ServiceMap) UpdateMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		pId := c.Param("id")
-		id, err := strconv.ParseUint(pId, 10, 32)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
-		}
-		err = service.ServiceMap().DeleteOne(ctx.DB, uint(id))
-		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
-		}
+		// var body
+		// data, err := service.ServiceMap().GetMany(ctx.DB)
+		// if err != nil {
+		// 	return util.Res(c).SendError(http.StatusConflict, err)
+		// }
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-			"ok": true,
+			// "serviceMap": data,
 		})
 	}
 }
+
+// func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		pId := c.Param("id")
+// 		id, err := strconv.ParseUint(pId, 10, 32)
+// 		if err != nil {
+// 			return util.Res(c).SendError(http.StatusConflict, err)
+// 		}
+// 		err = service.ServiceMap().DeleteOne(ctx.DB, uint(id))
+// 		if err != nil {
+// 			return util.Res(c).SendError(http.StatusConflict, err)
+// 		}
+// 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+// 			"ok": true,
+// 		})
+// 	}
+// }

@@ -14,7 +14,7 @@ import (
 
 type User struct{}
 
-func (h *User) AddMultipleUser(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (h User) AddMultipleUser(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		var body requestdto.UserList
@@ -44,7 +44,7 @@ func (h *User) AddMultipleUser(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (h *User) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (h User) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
@@ -65,7 +65,7 @@ func (h *User) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (h *User) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (h User) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		user, err := service.

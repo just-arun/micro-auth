@@ -1,21 +1,25 @@
 package acl
 
-type ACL string
+	type ACL string
 
-const (
-   		ACLRoleGetOne ACL = "auth.Role.GetOne"
-       ACLAuthLogin ACL = "auth.Auth.Login"
-       ACLAuthRegister ACL = "auth.Auth.Register"
-       ACLServiceMapAdd ACL = "auth.ServiceMap.Add"
-       ACLServiceMapUpdateOne ACL = "auth.ServiceMap.UpdateOne"
-       ACLRoleGetNames ACL = "auth.Role.GetNames"
-       ACLAccessDeleteOne ACL = "auth.Access.DeleteOne"
-       ACLroutesAuth ACL = "routes.Auth"
-       ACLServiceMapGetMany ACL = "auth.ServiceMap.GetMany"
-       ACLAuthGetPublicKey ACL = "auth.Auth.GetPublicKey"
-       ACLAccessAddOne ACL = "auth.Access.AddOne"
-       ACLAccessGetAll ACL = "auth.Access.GetAll"
-       ACLServiceMapGetOne ACL = "auth.ServiceMap.GetOne"
-       ACLServiceMapDeleteOne ACL = "auth.ServiceMap.DeleteOne"
-       ACLRoleAddRole ACL = "auth.Role.AddRole"
-    )
+	const (
+	 ACLUserGetOne ACL = "auth.User.GetOne"
+	     ACLRoleGetOne ACL = "auth.Role.GetOne"
+	     ACLroutesAuth ACL = "routes.Auth"
+	     ACLServiceMapGetMany ACL = "auth.ServiceMap.GetMany"
+	     ACLGeneralGet ACL = "auth.General.Get"
+	     ACLGeneralUpdate ACL = "auth.General.Update"
+	     ACLAuthLogin ACL = "auth.Auth.Login"
+	     ACLServiceMapGetOne ACL = "auth.ServiceMap.GetOne"
+	     ACLUserAddMultipleUser ACL = "auth.User.AddMultipleUser"
+	     ACLUserGetMany ACL = "auth.User.GetMany"
+	     ACLRoleAddRole ACL = "auth.Role.AddRole"
+	     ACLAccessAddOne ACL = "auth.Access.AddOne"
+	     ACLAuthRegister ACL = "auth.Auth.Register"
+	     ACLAuthGetPublicKey ACL = "auth.Auth.GetPublicKey"
+	     ACLAccessGetAll ACL = "auth.Access.GetAll"
+	     ACLServiceMapAdd ACL = "auth.ServiceMap.Add"
+	     ACLRoleGetNames ACL = "auth.Role.GetNames"
+	     ACLRoleAddAccess ACL = "auth.Role.AddAccess"
+	    )
+	

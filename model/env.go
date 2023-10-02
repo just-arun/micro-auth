@@ -35,10 +35,11 @@ type userSeed struct {
 }
 
 type Env struct {
-	DB      db       `mapstructure:"db"`
-	Grpc    grpc     `mapstructure:"grpc"`
-	Nats    natsEnv  `mapstructure:"nats"`
-	Rsa     rsaEnv   `mapstructure:"rsa"`
-	General general  `mapstructure:"general"`
-	Admin   userSeed `mapstructure:"admin"`
+	DB         db         `mapstructure:"db"`
+	Grpc       grpc       `mapstructure:"grpc"`
+	Nats       natsEnv    `mapstructure:"nats"`
+	Rsa        rsaEnv     `mapstructure:"rsa"`
+	General    general    `mapstructure:"general"`
+	Admin      userSeed   `mapstructure:"admin"`
+	ServiceMap []ServiceMap `mapstructure:"serviceMap"`
 }

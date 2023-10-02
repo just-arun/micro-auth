@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/just-arun/micro-auth/model"
 	"github.com/just-arun/micro-auth/service"
@@ -36,24 +35,24 @@ func (r Access) AddOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
-func (r Access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		pId := c.Param("id")
-		id, err := strconv.ParseUint(pId, 10, 32)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
-		}
+// func (r Access) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		pId := c.Param("id")
+// 		id, err := strconv.ParseUint(pId, 10, 32)
+// 		if err != nil {
+// 			return util.Res(c).SendError(http.StatusConflict, err)
+// 		}
 
-		err = service.Access().DeleteOne(ctx.DB, uint(id))
-		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
-		}
+// 		err = service.Access().DeleteOne(ctx.DB, uint(id))
+// 		if err != nil {
+// 			return util.Res(c).SendError(http.StatusConflict, err)
+// 		}
 
-		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-			"data": "Access Deleted",
-		})
-	}
-}
+// 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+// 			"data": "Access Deleted",
+// 		})
+// 	}
+// }
 
 func (r Access) GetAll(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {

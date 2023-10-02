@@ -54,4 +54,8 @@ func Run(context, envi string) {
 		RefreshTokenExpiryTime:  env.General.RefreshTOkenExpiryTime,
 		OrganizationEmailDomain: env.General.OrganizationEmailDomain,
 	})
+
+	for _, v := range env.ServiceMap {
+		_ = service.ServiceMap().Add(pDb, &v)
+	}
 }

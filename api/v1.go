@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/just-arun/micro-auth/boot"
@@ -15,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
+func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string, noServer ...bool) {
 
 	env := &model.Env{}
 	n := fmt.Sprintf(".env.%v", environment)
@@ -46,37 +45,6 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	routes.Role(v1, ctx)
 	routes.ServiceMap(v1, ctx)
 
-	data, _ := json.MarshalIndent(e.Routes(), "", "  ")
-	fmt.Println(string(data))
-
-	// 	var data []model.ServiceMap
-	// 	aclData := `package acl
-
-	// type ACL string
-
-	// const (
-	// `
-	// 	for _, v := range util.GetPath(e) {
-	// 		da := model.ServiceMap{
-	// 			Key:   v.Key,
-	// 			Value: strings.ReplaceAll(v.Value, ".", " "),
-	// 			Auth:  true,
-	// 		}
-	// 		aclData += fmt.Sprintf(`   ACL%v ACL = "%v"
-	//     `,
-	// 			strings.ReplaceAll(strings.ReplaceAll(v.Value, "auth.", ""), ".", ""),
-	// 			v.Key,
-	// 		)
-	// 		data = append(data, da)
-	// 	}
-	// 	aclData += `)
-	// `
-	// 	os.WriteFile("acl/acl.go", []byte(aclData), 0644)
-
-	// 	for _, v := range data {
-	// 		pDb.Save(&v)
-	// 	}
-
 	byteData, err := service.ServiceMap().GetMany(ctx.DB)
 	if err != nil {
 		panic(err)
@@ -84,6 +52,16 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string) {
 	_ = pubsub.Publisher().ChangeServiceMap(natsConnection, byteData)
 
 	serverPort := fmt.Sprintf(":%v", port)
+
+	// check if server is required
+	if len(noServer) == 1 {
+		if noServer[0] {
+			service.Access().GetSitemapAcl(e, pDb)
+			service.Role().PopulateBasicRole(pDb)
+			return
+		}
+	}
+
 	e.Logger.Fatal(
 		e.Start(serverPort),
 	)

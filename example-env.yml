@@ -1,0 +1,52 @@
+db:
+    uri: "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+grpc:
+    host: "localhost"
+    port: ":4200"
+nats:
+    token: "LvClPXjWSiXwwiFrVPwSdzsqWAPKfzWIzjAvdsCg"
+rsa:
+    privateKey: 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
+general:
+    can_login: true
+    can_regiser: true
+    http_only_cookie: true
+    access_token_expiry_time: 600
+    refresh_token_expiry_time: 36000
+    organization_email_domain: gmail.com
+admin:
+    email: superadmin@auth.dev
+    userName: super user
+    password: pwd123
+serviceMap:
+    - 
+        key: "auth"
+        value: "http://localhost:8090/api/v1/auth"
+        auth: false
+        default: true
+    - 
+        key: "general"
+        value: "http://localhost:8090/api/v1"
+        auth: false
+        default: true
+    - 
+        key: "access"
+        value: "http://localhost:8090/api/v1/access"
+        auth: true
+        default: true
+    - 
+        key: "roles"
+        value: "http://localhost:8090/api/v1/roles"
+        auth: true
+        default: true
+    - 
+        key: "service-map"
+        value: "http://localhost:8090/api/v1/service-map"
+        auth: true
+        default: true
+    - 
+        key: "user"
+        value: "http://localhost:8090/api/v1/user"
+        auth: true
+        default: true
+

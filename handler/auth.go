@@ -95,9 +95,12 @@ func (a Auth) Login(ctx *model.HandlerCtx) echo.HandlerFunc {
 				Secure: true,
 				MaxAge: int(general.RefreshTokenExpiryTime),
 			})
+			return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+				"ok": true,
+			})
 		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-			"daa": map[string]interface{}{
+			"data": map[string]interface{}{
 				"accessToken":  resp.Token,
 				"refreshToken": resp.Refresh,
 			},

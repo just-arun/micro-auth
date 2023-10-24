@@ -5,6 +5,7 @@ import (
 
 	"github.com/just-arun/micro-auth/acl"
 	"github.com/just-arun/micro-auth/model"
+	responsedto "github.com/just-arun/micro-auth/response-dto"
 	"gorm.io/gorm"
 )
 
@@ -14,17 +15,27 @@ func Role() role {
 	return role{}
 }
 
-func (r role) GetNames(db *gorm.DB) (roles []model.Role, err error) {
+func (r role) GetNames(db *gorm.DB) (roles []responsedto.GetAllRolesName, err error) {
 	err = db.
-		// Preload(clause.Associations).
-		Preload("Accesses").
-		Find(&roles).Error
-	// Model(&model.Role{}).Scan(&roles).Error
+		Model(&model.Role{}).Scan(&roles).Error
 	return
 }
 
 func (r role) Add(db *gorm.DB, role *model.Role) (err error) {
 	err = db.Save(&role).Error
+	return
+}
+
+func (r role) UpdateAccesses(db *gorm.DB, id uint, access []model.Access) (err error) {
+	role := &model.Role{ID: id}
+	tnx := db.First(&role)
+	if tnx.Error != nil {
+		return err
+	}
+	role.Accesses = access
+	if tnx.Save(role).Error != nil {
+		return
+	}
 	return
 }
 
@@ -55,12 +66,14 @@ func (r role) AddMultipleAccess(db *gorm.DB, id uint, access []model.Access) (er
 }
 
 func (r role) GetOne(db *gorm.DB, id uint) (role *model.Role, err error) {
-	err = db.Preload("Access").First(&model.Role{ID: id}).Scan(&role).Error
+	role = &model.Role{ID: id}
+	err = db.Preload("Accesses").
+		First(&role).Error
 	return
 }
 
 func (r role) PopulateBasicRole(db *gorm.DB) (err error) {
-	accesses, err := Access().GetMany(db, []string{
+	accesses, err := Access().GetManyWithKeys(db, []string{
 		string(acl.ACLAuthLogin),
 		string(acl.ACLAuthGetPublicKey),
 	})
@@ -80,4 +93,16 @@ func (r role) PopulateBasicRole(db *gorm.DB) (err error) {
 	_ = db.Save(&role).Error
 	_ = r.AddMultipleAccess(db, role.ID, accesses)
 	return
+}
+
+
+func (r role) DeleteOne(db *gorm.DB, id uint) (err error) {
+	err = db.Delete(&model.Role{}, id).Error
+	return 	
+}
+
+
+func (r role) DeleteMultiple(db *gorm.DB) (err error) {
+	// delete marked items
+	return 	
 }

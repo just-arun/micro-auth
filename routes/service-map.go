@@ -12,5 +12,6 @@ func ServiceMap(r *echo.Group, ctx *model.HandlerCtx) {
 	rout.GET("", st.GetMany(ctx))
 	rout.GET("/:id", st.GetOne(ctx))
 	rout.POST("", st.Add(ctx))
-	// rout.DELETE("/:id", st.DeleteOne(ctx))
+	rout.PUT("/:id", st.UpdateOne(ctx))
+	rout.DELETE("/:id", st.DeleteOne(ctx))
 }

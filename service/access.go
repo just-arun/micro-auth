@@ -26,8 +26,36 @@ func (r access) GetAll(db *gorm.DB) (accesses []model.Access, err error) {
 	return
 }
 
-func (r access) GetMany(db *gorm.DB, filter []string) (accesses []model.Access, err error) {
+func (r access) GetManyWithKeys(db *gorm.DB, filter []string) (accesses []model.Access, err error) {
 	err = db.Model(&model.Access{}).Where("key IN ?", filter).Scan(&accesses).Error
+	return
+}
+
+func (r access) GetMany(db *gorm.DB, searchQuery string, pagination *util.Pagination) (accesses []model.Access, err error) {
+	tnx := db.Model(&model.Access{})
+
+	if len(searchQuery) > 0 {
+		tnx = tnx.
+			Where("name ILIKE ?", "%"+searchQuery+"%").
+			Or("key ILIKE ?", "%"+searchQuery+"%")
+		if pagination != nil {
+			tnx.Count(&pagination.Total)
+		}
+	} else {
+		if pagination != nil {
+			tnx.Count(&pagination.Total)
+		}
+	}
+
+	if pagination != nil {
+		if pagination != nil {
+			tnx = tnx.Offset(int(pagination.Skip))
+			tnx = tnx.Limit(int(pagination.Limit))
+		}
+	}
+
+	err = tnx.Scan(&accesses).Error
+
 	return
 }
 

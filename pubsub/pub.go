@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/just-arun/micro-auth/model"
@@ -17,14 +16,6 @@ func Publisher() *pub {
 }
 
 func (st pub) ChangeServiceMap(con *nats.EncodedConn, data []model.ServiceMap) error {
-	byteData, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	fmt.Println("++++++++++++")
-	fmt.Println(byteData)
-	fmt.Println("++++++++++++")
-	fmt.Println(string(byteData))
-	fmt.Println("++++++++++++")
+	fmt.Println(data)
 	return con.Publish("change-service-map", data)
 }

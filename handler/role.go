@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -68,6 +69,40 @@ func (r Role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
+func (r Role) UpdateAccesses(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		type Body struct {
+			Accesses []model.Access `json:"accesses"`
+		}
+
+		var body Body
+
+		if err := json.
+			NewDecoder(
+				c.Request().Body,
+			).
+			Decode(&body); err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.Role().UpdateAccesses(ctx.DB, uint(id), body.Accesses)
+
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"data": fmt.Sprintf("Access updated for role %v", id),
+		})
+	}
+}
+
 func (r Role) AddAccess(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		pId := c.Param("id")
@@ -93,6 +128,26 @@ func (r Role) AddAccess(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"data": "Access added to role",
+		})
+	}
+}
+
+func (r Role) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.Role().DeleteOne(ctx.DB, uint(id))
+
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"data": "role deleted",
 		})
 	}
 }

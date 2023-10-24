@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/just-arun/micro-auth/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -55,8 +57,10 @@ func (u user) GetOne(db *gorm.DB, filter *model.User) (*model.User, error) {
 }
 
 func (u user) GetMany(db *gorm.DB, filter *model.User) (data []model.User, err error) {
+	fmt.Println("ROLES", 23)
 	err = db.
 		Model(&filter).
+		Preload("Roles").
 		Scan(&data).
 		Error
 	return

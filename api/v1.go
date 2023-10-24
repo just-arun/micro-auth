@@ -5,6 +5,7 @@ import (
 
 	"github.com/just-arun/micro-auth/boot"
 	"github.com/just-arun/micro-auth/connections"
+	"github.com/just-arun/micro-auth/jobs"
 	"github.com/just-arun/micro-auth/model"
 	"github.com/just-arun/micro-auth/pubsub"
 	"github.com/just-arun/micro-auth/routes"
@@ -45,7 +46,7 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string, noSer
 	routes.Role(v1, ctx)
 	routes.ServiceMap(v1, ctx)
 
-	byteData, err := service.ServiceMap().GetMany(ctx.DB)
+	byteData, err := service.ServiceMap().GetMany(ctx.DB, "", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -61,6 +62,8 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string, noSer
 			return
 		}
 	}
+
+	jobs.Register(ctx)
 
 	e.Logger.Fatal(
 		e.Start(serverPort),

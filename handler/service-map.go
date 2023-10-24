@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/just-arun/micro-auth/model"
-	"github.com/just-arun/micro-auth/pubsub"
 	requestdto "github.com/just-arun/micro-auth/request-dto"
 	"github.com/just-arun/micro-auth/service"
 	"github.com/just-arun/micro-auth/util"
@@ -31,14 +30,9 @@ func (st ServiceMap) Add(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 
-		allData, err := service.ServiceMap().GetMany(ctx.DB)
+		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
 		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
-		}
-
-		err = pubsub.Publisher().ChangeServiceMap(ctx.NatsConnection, allData)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
 		return util.Res(c).SendSuccess(http.StatusCreated, map[string]interface{}{
@@ -59,7 +53,7 @@ func (st ServiceMap) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 		if data == nil {
-			return util.Res(c).SendError(http.StatusConflict, fmt.Errorf("Not Found"))
+			return util.Res(c).SendError(http.StatusConflict, fmt.Errorf("not found"))
 		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"data": data,
@@ -69,42 +63,110 @@ func (st ServiceMap) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 func (st ServiceMap) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		data, err := service.ServiceMap().GetMany(ctx.DB)
+		search := c.QueryParam("search")
+
+		pagination, err := util.Req(c).Pagination()
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		data, err := service.ServiceMap().GetMany(ctx.DB, search, pagination)
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"serviceMap": data,
+		}, map[string]interface{}{
+			"metaData": pagination,
 		})
 	}
 }
 
-func (st ServiceMap) UpdateMany(ctx *model.HandlerCtx) echo.HandlerFunc {
+func (st ServiceMap) UpdateOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// var body
-		// data, err := service.ServiceMap().GetMany(ctx.DB)
-		// if err != nil {
-		// 	return util.Res(c).SendError(http.StatusConflict, err)
-		// }
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		var body model.ServiceMap
+		if err := json.NewDecoder(c.Request().Body).Decode(&body); err != nil {
+			return util.Res(c).SendError(http.StatusBadRequest, err)
+		}
+
+		serviceMap, err := service.ServiceMap().GetOne(ctx.DB, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		if serviceMap.Default {
+
+			if err := service.ServiceMap().UpdateOne(ctx.DB, uint(id), &model.ServiceMap{
+				Value:   body.Value,
+				Auth:    body.Auth,
+				Key:     serviceMap.Key,
+				Default: serviceMap.Default,
+			}); err != nil {
+				return util.Res(c).SendError(http.StatusInternalServerError, err)
+			}
+
+			err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+			if err != nil {
+				return util.Res(c).SendError(http.StatusInternalServerError, err)
+			}
+
+			return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+				"ok": true,
+			})
+
+		}
+
+		err = service.ServiceMap().UpdateOne(ctx.DB, uint(id), &body)
+
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-			// "serviceMap": data,
+			"ok": true,
 		})
 	}
 }
 
-// func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		pId := c.Param("id")
-// 		id, err := strconv.ParseUint(pId, 10, 32)
-// 		if err != nil {
-// 			return util.Res(c).SendError(http.StatusConflict, err)
-// 		}
-// 		err = service.ServiceMap().DeleteOne(ctx.DB, uint(id))
-// 		if err != nil {
-// 			return util.Res(c).SendError(http.StatusConflict, err)
-// 		}
-// 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
-// 			"ok": true,
-// 		})
-// 	}
-// }
+func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		serviceMap, err := service.ServiceMap().GetOne(ctx.DB, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		if serviceMap.Default {
+			return util.Res(c).SendError(http.StatusBadRequest, fmt.Errorf("can't delete default service map"))
+		}
+
+		err = service.ServiceMap().DeleteOne(ctx.DB, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"ok": true,
+		})
+	}
+}

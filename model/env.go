@@ -20,12 +20,12 @@ type rsaEnv struct {
 }
 
 type general struct {
-	CanLogin                bool          `mapstructure:"canLogin"`
-	CanRegister             bool          `mapstructure:"canRegister"`
-	HttpOnlyCookie          bool          `mapstructure:"httpOnlyCookie"`
-	AccessTokenExpiryTime   time.Duration `mapstructure:"accessTokenExpiryTime"`
-	RefreshTOkenExpiryTime  time.Duration `mapstructure:"refreshTOkenExpiryTime"`
-	OrganizationEmailDomain string        `mapstructure:"organizationEmailDomain"`
+	CanLogin                bool          `mapstructure:"can_login"`
+	CanRegister             bool          `mapstructure:"can_register"`
+	HttpOnlyCookie          bool          `mapstructure:"http_only_cookie"`
+	AccessTokenExpiryTime   time.Duration `mapstructure:"access_token_expiry_time"`
+	RefreshTOkenExpiryTime  time.Duration `mapstructure:"refresh_token_expiry_time"`
+	OrganizationEmailDomain string        `mapstructure:"organization_email_domain"`
 }
 
 type userSeed struct {
@@ -35,11 +35,11 @@ type userSeed struct {
 }
 
 type Env struct {
-	DB         db         `mapstructure:"db"`
-	Grpc       grpc       `mapstructure:"grpc"`
-	Nats       natsEnv    `mapstructure:"nats"`
-	Rsa        rsaEnv     `mapstructure:"rsa"`
-	General    general    `mapstructure:"general"`
-	Admin      userSeed   `mapstructure:"admin"`
+	DB         db           `mapstructure:"db"`
+	Grpc       grpc         `mapstructure:"grpc"`
+	Nats       natsEnv      `mapstructure:"nats"`
+	Rsa        rsaEnv       `mapstructure:"rsa"`
+	General    general      `mapstructure:"general"`
+	Admin      userSeed     `mapstructure:"admin"`
 	ServiceMap []ServiceMap `mapstructure:"serviceMap"`
 }

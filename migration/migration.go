@@ -19,6 +19,8 @@ func Run(context, envi string) {
 	// register enums
 	sql := model.RegisterUserType()
 	_ = pDb.Exec(sql).Error
+	sql = model.RegisterTokenPlacement()
+	_ = pDb.Exec(sql).Error
 
 	err := pDb.AutoMigrate(
 		&model.User{},
@@ -46,14 +48,18 @@ func Run(context, envi string) {
 	// registering super user user
 	_, _ = service.User().CreateOne(pDb, user)
 
-	_ = service.General().Create(pDb, &model.General{
+	generalData := &model.General{
 		CanLogin:                env.General.CanLogin,
 		CanRegister:             env.General.CanRegister,
 		HttpOnlyCookie:          env.General.HttpOnlyCookie,
 		AccessTokenExpiryTime:   env.General.AccessTokenExpiryTime,
 		RefreshTokenExpiryTime:  env.General.RefreshTOkenExpiryTime,
 		OrganizationEmailDomain: env.General.OrganizationEmailDomain,
-	})
+	}
+
+	fmt.Println(generalData)
+
+	_ = service.General().Create(pDb, generalData)
 
 	for _, v := range env.ServiceMap {
 		_ = service.ServiceMap().Add(pDb, &v)

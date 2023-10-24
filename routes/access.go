@@ -11,7 +11,8 @@ func Access(r *echo.Group, ctx *model.HandlerCtx) {
 	rout := r.Group("/access")
 	rout.POST("", st.AddOne(ctx)) // , middleware.Auth(ctx, acl.ACLAccessAddOne)
 
-	rout.GET("", st.GetAll(ctx)) // middleware.Auth(ctx, acl.ACLAccessGetAll),
+	rout.GET("", st.GetMany(ctx))                // middleware.Auth(ctx, acl.ACLAccessGetAll),
+	rout.PUT("/:id/name", st.UpdateOneName(ctx)) // middleware.Auth(ctx, acl.ACLAccessGetAll),
 
 	// rout.DELETE("/:id", st.DeleteOne(ctx)) // middleware.Auth(ctx, acl.ACLAccessDeleteOne),
 

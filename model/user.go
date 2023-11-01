@@ -39,7 +39,7 @@ type User struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Email     string    `json:"email" gorm:"uniqueIndex"`
 	UserName  string    `json:"userName"`
-	Password  string    `json:"password"`
+	Password  string    `json:"password,omitempty"`
 	Type      UserType  `json:"type" gorm:"type:user_type;default:UN_VERIFIED"`
 	Roles     []Role    `json:"roles" gorm:"many2many:user_role;foreignKey:ID"`
 	Apps      []App     `json:"apps" gorm:"many2many:user_app;foreignKey:ID"`

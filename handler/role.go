@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	grpcclient "github.com/just-arun/micro-auth/grpcClient"
 	"github.com/just-arun/micro-auth/model"
 	"github.com/just-arun/micro-auth/service"
 	"github.com/just-arun/micro-auth/util"
@@ -58,7 +59,12 @@ func (r Role) AddRole(ctx *model.HandlerCtx) echo.HandlerFunc {
 		err := service.Role().Add(ctx.DB, &role)
 
 		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		err = grpcclient.Role().SetRole(*ctx.GrpcClient, &role)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
 		return util.Res(c).SendSuccess(http.StatusCreated, map[string]interface{}{
@@ -92,9 +98,13 @@ func (r Role) UpdateAccesses(ctx *model.HandlerCtx) echo.HandlerFunc {
 		}
 
 		err = service.Role().UpdateAccesses(ctx.DB, uint(id), body.Accesses)
-
 		if err != nil {
-			return util.Res(c).SendError(http.StatusConflict, err)
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		err = r.updateRoleInSession(ctx, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
@@ -126,6 +136,11 @@ func (r Role) AddAccess(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
 
+		err = r.updateRoleInSession(ctx, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"data": "Access added to role",
 		})
@@ -150,4 +165,19 @@ func (r Role) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 			"data": "role deleted",
 		})
 	}
+}
+
+func (r Role) updateRoleInSession(ctx *model.HandlerCtx, id uint) error {
+	role, err := service.Role().GetOne(ctx.DB, id)
+
+	if err != nil {
+		return err
+	}
+
+	err = grpcclient.Role().SetRole(*ctx.GrpcClient, role)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Role updated in session")
+	return nil
 }

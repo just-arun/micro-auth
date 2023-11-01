@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	grpcclient "github.com/just-arun/micro-auth/grpcClient"
 	"github.com/just-arun/micro-auth/model"
 	requestdto "github.com/just-arun/micro-auth/request-dto"
 	"github.com/just-arun/micro-auth/service"
@@ -55,9 +56,12 @@ func (h User) GetOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 		user, err := service.
 			User().
 			GetOne(ctx.DB, &model.User{ID: uint(id)})
+
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
+
+		user.Password = ""
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"user": user,
@@ -77,6 +81,56 @@ func (h User) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"users": user,
+		})
+	}
+}
+
+func (h User) UpdateUserRole(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		type Body struct {
+			Roles []model.Role `json:"roles"`
+		}
+
+		var body Body
+
+		if err := json.NewDecoder(c.Request().Body).Decode(&body); err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.User().UpdateRole(ctx.DB, uint(id), body.Roles)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		err = grpcclient.UserSession().ClearUserAllSession(*ctx.GrpcClient, 1)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+
+		c.SetCookie(&http.Cookie{
+			Name:   "x-session",
+			Value:  "",
+			Path:   "/",
+			Secure: true,
+			MaxAge: int(0),
+		})
+
+		c.SetCookie(&http.Cookie{
+			Name:   "x-refresh",
+			Value:  "",
+			Path:   "/",
+			Secure: true,
+			MaxAge: int(0),
+		})
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"message": "role updated",
 		})
 	}
 }

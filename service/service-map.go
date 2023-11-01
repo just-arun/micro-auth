@@ -67,5 +67,10 @@ func (st serviceMap) PublishSitemap(db *gorm.DB, con *nats.EncodedConn) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("publishing sitemap")
+
+	fmt.Println(data)
+
 	return pubsub.Publisher().ChangeServiceMap(con, data)
 }

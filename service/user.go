@@ -48,7 +48,6 @@ func (u user) GetOne(db *gorm.DB, filter *model.User) (*model.User, error) {
 	tnx := db.
 		Model(&model.User{}).
 		Preload(clause.Associations).
-		// Preload("Apps").
 		First(&filter)
 	if tnx.Error != nil {
 		return nil, tnx.Error
@@ -78,4 +77,8 @@ func (u user) AddApp(db *gorm.DB, userID uint, apps []model.App) error {
 		return tnx.Error
 	}
 	return nil
+}
+
+func (u user) UpdateRole(db *gorm.DB, userID uint, roles []model.Role) error {
+	return db.Model(&model.User{ID: userID}).Association("Roles").Replace(roles)
 }

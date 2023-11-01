@@ -17,6 +17,9 @@ type ServiceMap struct{}
 
 func (st ServiceMap) Add(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		defer func() {
+			service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+		}()
 		var serviceMap *requestdto.CreateServiceMap
 		if err := json.NewDecoder(c.Request().Body).Decode(&serviceMap); err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
@@ -28,11 +31,6 @@ func (st ServiceMap) Add(ctx *model.HandlerCtx) echo.HandlerFunc {
 		})
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
-		}
-
-		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
 		return util.Res(c).SendSuccess(http.StatusCreated, map[string]interface{}{
@@ -84,6 +82,12 @@ func (st ServiceMap) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 func (st ServiceMap) UpdateOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		defer func() {
+			fmt.Println("+++++++++")
+			err := service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+			fmt.Println("+++++++++-------", err)
+		}()
+
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
 		if err != nil {
@@ -111,11 +115,6 @@ func (st ServiceMap) UpdateOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 				return util.Res(c).SendError(http.StatusInternalServerError, err)
 			}
 
-			err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
-			if err != nil {
-				return util.Res(c).SendError(http.StatusInternalServerError, err)
-			}
-
 			return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 				"ok": true,
 			})
@@ -128,10 +127,6 @@ func (st ServiceMap) UpdateOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
-		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusInternalServerError, err)
-		}
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"ok": true,
 		})
@@ -140,6 +135,9 @@ func (st ServiceMap) UpdateOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		defer func() {
+			service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
+		}()
 		pId := c.Param("id")
 		id, err := strconv.ParseUint(pId, 10, 32)
 		if err != nil {
@@ -158,11 +156,6 @@ func (st ServiceMap) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 		err = service.ServiceMap().DeleteOne(ctx.DB, uint(id))
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
-		}
-
-		err = service.ServiceMap().PublishSitemap(ctx.DB, ctx.NatsConnection)
-		if err != nil {
-			return util.Res(c).SendError(http.StatusInternalServerError, err)
 		}
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{

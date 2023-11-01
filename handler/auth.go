@@ -74,7 +74,9 @@ func (a Auth) Login(ctx *model.HandlerCtx) echo.HandlerFunc {
 		}
 		fmt.Println(7)
 
-		resp, err := grpcClient.UserSession().SetUserSession(*ctx.GrpcClient, user.ID, roles)
+		resp, err := grpcClient.UserSession().SetUserSession(*ctx.GrpcClient, user.ID, roles,
+			int(general.AccessTokenExpiryTime), int(general.RefreshTokenExpiryTime),
+		)
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}
@@ -160,7 +162,7 @@ func (a Auth) GetPublicKey(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 		publicKey := util.Rsa2().GenerateBase64PublicKeyFromPrivateKey(privateKey)
 
-		_, err = grpcClient.UserSession().SetUserSession(*ctx.GrpcClient, 2, []string{"admin", "analyst"})
+		_, err = grpcClient.UserSession().SetUserSession(*ctx.GrpcClient, 2, []string{"admin", "analyst"}, 600, 36000)
 		if err != nil {
 			return util.Res(c).SendError(http.StatusConflict, err)
 		}

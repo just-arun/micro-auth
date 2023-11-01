@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/just-arun/micro-auth/acl"
@@ -13,13 +14,21 @@ func Auth(ctx *model.HandlerCtx, routeAccessReferenceKey acl.ACL) func(next echo
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			result, err := grpcclient.UserSession().HaveAccess(*ctx.GrpcClient, c.Request(), string(routeAccessReferenceKey))
+
+			fmt.Println("access", result, err)
+
 			if err != nil {
-				return c.JSON(http.StatusUnauthorized, map[string]string{
+				return c.JSON(http.StatusForbidden, map[string]string{
 					"error": "unauthorized",
 				})
 			}
-			if !result.Access {
+			if result == nil {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
+					"error": "protected endpoint",
+				})
+			}
+			if !result.Access {
+				return c.JSON(http.StatusForbidden, map[string]string{
 					"error": "unauthorized",
 				})
 			}

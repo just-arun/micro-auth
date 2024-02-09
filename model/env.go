@@ -37,6 +37,7 @@ type userSeed struct {
 type Env struct {
 	DB         db           `mapstructure:"db"`
 	Grpc       grpc         `mapstructure:"grpc"`
+	MailGrpc   grpc         `mapstructure:"mailGrpc"`
 	Nats       natsEnv      `mapstructure:"nats"`
 	Rsa        rsaEnv       `mapstructure:"rsa"`
 	General    general      `mapstructure:"general"`

@@ -38,6 +38,8 @@ func (st serviceMap) GetMany(db *gorm.DB, searchQuery string, pagination *util.P
 			tnx.Count(&pagination.Total)
 		}
 	}
+	
+	tnx = tnx.Order("id DESC")
 
 	if pagination != nil {
 		tnx = tnx.Offset(int(pagination.Skip))

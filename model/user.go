@@ -47,17 +47,6 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-type SlimUser struct {
-	ID       uint     `json:"id" gorm:"primaryKey"`
-	Email    string   `json:"email" gorm:"uniqueIndex"`
-	UserName string   `json:"userName"`
-	Type     UserType `json:"type"`
-	Roles    []struct {
-		Name string `json:"name"`
-	} `json:"roles"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 func (u *User) HashPassword(tx *gorm.DB) (err error) {
 	if len(u.Password) > 20 {
 		return nil
@@ -78,4 +67,8 @@ func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 // gorm hook
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return u.HashPassword(tx)
+}
+
+func (User) TableName() string {
+	return "users"
 }

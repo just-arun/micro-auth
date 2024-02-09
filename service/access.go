@@ -22,22 +22,33 @@ func (r access) AddOne(db *gorm.DB, access model.Access) error {
 }
 
 func (r access) GetAll(db *gorm.DB) (accesses []model.Access, err error) {
-	err = db.Model(&model.Access{}).Scan(&accesses).Error
+	err = db.Model(&model.Access{}).Scan(&accesses).Order("created_at DESC").Error
 	return
 }
 
 func (r access) GetManyWithKeys(db *gorm.DB, filter []string) (accesses []model.Access, err error) {
-	err = db.Model(&model.Access{}).Where("key IN ?", filter).Scan(&accesses).Error
+	err = db.Model(&model.Access{}).
+		Where("key IN ?", filter).
+		Order("id DESC").
+		Scan(&accesses).
+		Error
+	return
+}
+
+func (r access) GetManyWithIDs(db *gorm.DB, IDs []string) (accesses []model.Access, err error) {
+	err = db.Model(&model.Access{}).Where("id IN ?", IDs).Scan(&accesses).Error
 	return
 }
 
 func (r access) GetMany(db *gorm.DB, searchQuery string, pagination *util.Pagination) (accesses []model.Access, err error) {
-	tnx := db.Model(&model.Access{})
+	tnx := db.Model(&model.Access{}).
+		Order("id DESC")
 
 	if len(searchQuery) > 0 {
 		tnx = tnx.
 			Where("name ILIKE ?", "%"+searchQuery+"%").
-			Or("key ILIKE ?", "%"+searchQuery+"%")
+			Or("key ILIKE ?", "%"+searchQuery+"%").
+			Order("id DESC")
 		if pagination != nil {
 			tnx.Count(&pagination.Total)
 		}
@@ -57,6 +68,29 @@ func (r access) GetMany(db *gorm.DB, searchQuery string, pagination *util.Pagina
 	err = tnx.Scan(&accesses).Error
 
 	return
+}
+
+func (r access) LinkedRoles(db *gorm.DB, id uint) (roleAccess []model.RoleAccess, err error) {
+	roleTableName := model.Role{}.TableName()
+	roleAccessAssociationTable := model.RoleAccess{}.TableName()
+
+	query := util.NamedStringFormate(`SELECT %{AssociationTable}s.role_id as role_id, %{MainTable}s.name as role_name
+	FROM %{AssociationTable}s
+	LEFT JOIN roles ON %{AssociationTable}s.role_id=roles.id
+	WHERE %{AssociationTable}s.access_id = ?`,
+		map[string]interface{}{
+			"MainTable":        roleTableName,
+			"AssociationTable": roleAccessAssociationTable,
+		},
+	)
+
+	result := []model.RoleAccess{}
+
+	err = db.Model(&model.RoleAccess{}).
+		Raw(query, id).
+		Scan(&result).Error
+
+	return result, err
 }
 
 func (r access) UpdateOneName(db *gorm.DB, id uint, name string) (err error) {

@@ -37,16 +37,22 @@ func Run(context, envi string) {
 		panic(err)
 	}
 
+	basicRole, _ := service.Role().GetOneByName(pDb, "basic")
+
 	user := &model.User{
 		Email:    env.Admin.Email,
 		UserName: env.Admin.UserName,
 		Password: env.Admin.Password,
-		Roles: []model.Role{},
+		Roles: []model.Role{*basicRole},
 		Apps: []model.App{},
 	}
 
 	// registering super user user
-	_, _ = service.User().CreateOne(pDb, user)
+	userID, _ := service.User().CreateOne(pDb, user)
+	
+	if userID != 0 {
+		_ = service.User().UpdateRole(pDb, userID, []model.Role{*basicRole})
+	}
 
 	generalData := &model.General{
 		CanLogin:                env.General.CanLogin,

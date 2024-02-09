@@ -167,6 +167,32 @@ func (r Role) DeleteOne(ctx *model.HandlerCtx) echo.HandlerFunc {
 	}
 }
 
+func (r Role) RemoveOneAccess(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		roleID, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+		pId0 := c.Param("accessID")
+		accessID, err := strconv.ParseUint(pId0, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		err = service.Role().RemoveOneAccess(ctx.DB, uint(roleID), uint(accessID))
+		
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"message": "access removed",
+		})
+	}
+}
+
+
 func (r Role) updateRoleInSession(ctx *model.HandlerCtx, id uint) error {
 	role, err := service.Role().GetOne(ctx.DB, id)
 

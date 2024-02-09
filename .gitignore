@@ -2,3 +2,4 @@ data/
 .env*
 nats.conf
 .seed*
+.DS_Store

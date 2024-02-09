@@ -14,5 +14,6 @@ func Role(r *echo.Group, ctx *model.HandlerCtx) {
 	rout.GET("/:id", st.GetOne(ctx))
 	rout.POST("", st.AddRole(ctx))
 	rout.PUT("/:id/accesses", st.UpdateAccesses(ctx))
+	rout.DELETE("/:id/accesses/:accessID", st.RemoveOneAccess(ctx))
 	rout.DELETE("/:id", st.DeleteOne(ctx))
 }

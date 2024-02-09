@@ -8,3 +8,8 @@ type Mail struct {
 	To      string
 	Message string
 }
+
+
+func (Mail) TableName() string {
+	return "mailes"
+}

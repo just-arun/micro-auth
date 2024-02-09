@@ -130,3 +130,20 @@ func (r Access) GetMany(ctx *model.HandlerCtx) echo.HandlerFunc {
 		})
 	}
 }
+
+func (r Access) LinkedRoles(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		pId := c.Param("id")
+		id, err := strconv.ParseUint(pId, 10, 32)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+		resp, err := service.Access().LinkedRoles(ctx.DB, uint(id))
+		if err != nil {
+			return util.Res(c).SendError(http.StatusInternalServerError, err)
+		}
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"roles": resp,
+		})
+	}
+}

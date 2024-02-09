@@ -13,6 +13,7 @@ func Access(r *echo.Group, ctx *model.HandlerCtx) {
 
 	rout.GET("", st.GetMany(ctx))                // middleware.Auth(ctx, acl.ACLAccessGetAll),
 	rout.PUT("/:id/name", st.UpdateOneName(ctx)) // middleware.Auth(ctx, acl.ACLAccessGetAll),
+	rout.GET("/:id/roles", st.LinkedRoles(ctx))
 
 	// rout.DELETE("/:id", st.DeleteOne(ctx)) // middleware.Auth(ctx, acl.ACLAccessDeleteOne),
 

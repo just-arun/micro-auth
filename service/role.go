@@ -28,13 +28,13 @@ func (r role) Add(db *gorm.DB, role *model.Role) (err error) {
 
 func (r role) UpdateAccesses(db *gorm.DB, id uint, access []model.Access) (err error) {
 	role := &model.Role{ID: id}
-	tnx := db.First(&role)
+	tnx := db.Model(&role)
 	if tnx.Error != nil {
 		return err
 	}
-	role.Accesses = access
-	if tnx.Save(role).Error != nil {
-		return
+	if err := tnx.Association("Accesses").Replace(access); err != nil {
+		fmt.Println("ER]", tnx.Error.Error())
+		return err
 	}
 	return
 }
@@ -72,6 +72,18 @@ func (r role) GetOne(db *gorm.DB, id uint) (role *model.Role, err error) {
 	return
 }
 
+func (r role) GetOneByName(db *gorm.DB, name string) (role *model.Role, err error) {
+	role = &model.Role{Name: name}
+	err = db.Preload("Accesses").
+		First(&role).Error
+	return
+}
+
+func (r role) RemoveOneAccess(db *gorm.DB, roleID, accessID uint) (err error) {
+	err = db.Delete(&model.RoleAccess{RoleID: roleID, AccessID: accessID}).Error
+	return
+}
+
 func (r role) PopulateBasicRole(db *gorm.DB) (err error) {
 	accesses, err := Access().GetManyWithKeys(db, []string{
 		string(acl.ACLAuthLogin),
@@ -89,20 +101,18 @@ func (r role) PopulateBasicRole(db *gorm.DB) (err error) {
 	role.Accesses = accesses
 
 	fmt.Println(role)
-	db.Delete(&model.Role{})
+	db.Delete(&model.Role{Name: "basic"})
 	_ = db.Save(&role).Error
 	_ = r.AddMultipleAccess(db, role.ID, accesses)
 	return
 }
 
-
 func (r role) DeleteOne(db *gorm.DB, id uint) (err error) {
 	err = db.Delete(&model.Role{}, id).Error
-	return 	
+	return
 }
-
 
 func (r role) DeleteMultiple(db *gorm.DB) (err error) {
 	// delete marked items
-	return 	
+	return
 }

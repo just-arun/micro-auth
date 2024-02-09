@@ -15,4 +15,5 @@ func Auth(rout *echo.Group, ctx *model.HandlerCtx) {
 	r.POST("/forgot-password", st.ForgotPassword(ctx))
 	r.POST("/update-password", st.UpdatePassword(ctx))
 	r.POST("/reset-password", st.ResetPassword(ctx))
+	r.POST("/send-mail", st.Otp(ctx))
 }

@@ -14,3 +14,7 @@ type Profile struct {
 	Country   string
 	CreatedAt time.Time
 }
+
+func (Profile) TableName() string {
+	return "profiles"
+}

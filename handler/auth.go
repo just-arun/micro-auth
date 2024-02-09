@@ -10,6 +10,7 @@ import (
 	requestDto "github.com/just-arun/micro-auth/request-dto"
 	"github.com/just-arun/micro-auth/service"
 	"github.com/just-arun/micro-auth/util"
+	pbMailing "github.com/just-arun/micro-session-proto/mailing"
 	"github.com/labstack/echo/v4"
 )
 
@@ -259,6 +260,28 @@ func (a Auth) RegisterVerify(ctx *model.HandlerCtx) echo.HandlerFunc {
 
 		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
 			"message": "user verified",
+		})
+	}
+}
+
+func (a Auth) Otp(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, err := grpcClient.EmailSession().SetMail(*ctx.MailGrpcClient, &pbMailing.MailSendTwoFactorAuthOtpPayload{
+			FromName:  "Arun",
+			FromEmail: "arun@techguide.dev",
+			ToName:    "Also Arun",
+			ToEmail:   "arun@techguide.dev",
+			Otp:       "234923",
+			Link:      "http://localhost:3000/api/user",
+			MailType:  pbMailing.MailType_TwoFactorAuth,
+		})
+		if err != nil {
+			fmt.Println("ERR: ", err.Error())
+			return util.Res(c).SendError(http.StatusOK, err)
+		}
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"ok": true,
 		})
 	}
 }

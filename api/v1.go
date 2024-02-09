@@ -12,6 +12,7 @@ import (
 	"github.com/just-arun/micro-auth/service"
 	"github.com/just-arun/micro-auth/util"
 	pb "github.com/just-arun/micro-session-proto"
+	pbMailing "github.com/just-arun/micro-session-proto/mailing"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,10 +27,12 @@ func apiV1(e *echo.Echo, g *echo.Group, environment, port, context string, noSer
 	ctx.DB = pDb
 
 	conn := boot.NewGrpcConnection(env.Grpc.Host, env.Grpc.Port)
-
 	client := pb.NewSessionServiceClient(conn)
-
 	ctx.GrpcClient = &client
+
+	conn1 := boot.NewGrpcConnection(env.MailGrpc.Host, env.MailGrpc.Port)
+	client1 := pbMailing.NewMailingNotificationServiceClient(conn1)
+	ctx.MailGrpcClient = &client1
 
 	natsConnection := boot.NatsConnection(env.Nats.Token)
 

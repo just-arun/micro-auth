@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,37 @@ import (
 )
 
 type User struct{}
+
+
+func (h User) AddUser(ctx *model.HandlerCtx) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		var body requestdto.AddUser
+		if err := json.NewDecoder(c.Request().Body).Decode(&body); err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		user := &model.User{}
+		user.Email = body.Email
+		user.UserName = body.UserName
+		user.Type = body.Type
+		user.Roles = body.Roles
+
+		id, err := service.User().CreateOne(ctx.DB, user)
+		if err != nil {
+			return util.Res(c).SendError(http.StatusConflict, err)
+		}
+
+		fmt.Println("*********************")
+		fmt.Println("[ID]", id)
+		fmt.Println("*********************")
+
+		return util.Res(c).SendSuccess(http.StatusOK, map[string]interface{}{
+			"id": id,
+		})
+	}
+}
+
 
 func (h User) AddMultipleUser(ctx *model.HandlerCtx) echo.HandlerFunc {
 	return func(c echo.Context) error {

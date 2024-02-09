@@ -14,7 +14,8 @@ func General(route *echo.Group, ctx *model.HandlerCtx) {
 	// 	middleware.Auth(ctx, "auth.general-create"))
 
 	rout.GET("", st.Get(ctx)) // middleware.Auth(ctx, "auth.general-get"),
-
-	rout.PUT("/:id", st.Update(ctx)) // middleware.Auth(ctx, "auth.general-update-one"),
+	rout.GET("/history", st.GetMany(ctx))
+	rout.PUT("/admin", st.UpdateAdmin(ctx)) // middleware.Auth(ctx, "auth.general-update-one"),
+	rout.PUT("/dev", st.UpdateDev(ctx))     // middleware.Auth(ctx, "auth.general-update-one"),
 
 }

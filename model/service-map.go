@@ -7,3 +7,7 @@ type ServiceMap struct {
 	Auth    bool   `json:"auth" gorm:"default:false" mapestructure:"auth"`
 	Default bool   `json:"default" mapestructure:"default"`
 }
+
+func (ServiceMap) TableName() string {
+	return "service_maps"
+}

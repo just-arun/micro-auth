@@ -3,7 +3,7 @@ module github.com/just-arun/micro-auth
 go 1.19
 
 require (
-	github.com/just-arun/micro-session-proto v1.0.20
+	github.com/just-arun/micro-session-proto v1.1.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/nats-io/nats.go v1.29.0
 	github.com/redis/go-redis/v9 v9.1.0
